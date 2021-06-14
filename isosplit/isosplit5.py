@@ -2,8 +2,8 @@ import numpy as np
 import scipy.linalg as la
 from scipy.spatial.distance import squareform, pdist
 
-from parcelate import parcelate2
-from isocut import isocut5
+from .parcelate2 import parcelate2
+from .isocut5 import isocut5
 
 
 # -- library

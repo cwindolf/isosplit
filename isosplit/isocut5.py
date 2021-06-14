@@ -1,6 +1,6 @@
 import numpy as np
 from itertools import chain
-from up_down import up_down_isotonic_regression, down_up_isotonic_regression
+from .up_down import up_down_isotonic_regression, down_up_isotonic_regression
 
 
 num_bins_factor = 1
