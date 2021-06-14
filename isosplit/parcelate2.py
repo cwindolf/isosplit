@@ -19,7 +19,7 @@ def parcelate2(
 
     # start with one parcel
     centroids = [X.mean(axis=1, keepdims=True)]
-    radii = [cdist(centroids[0], X).max()]
+    radii = [cdist(centroids[0].T, X.T).max()]
     indices = [np.arange(N)]
     labels = np.zeros(N, dtype=int)
 
@@ -48,7 +48,7 @@ def parcelate2(
             if inds.size > target_parcel_size and rad >= target_radius:
                 # take the first `split_factor` points as representatives
                 pts = X[:, inds[:split_factor]]
-                D = cdist(pts, X[:, inds])
+                D = cdist(pts.T, X[:, inds].T)
                 assignments = D.argmin(axis=0)
                 keepers = np.flatnonzero(assignments == 0)
                 if keepers.size and not keepers.size == inds.size:
@@ -60,19 +60,21 @@ def parcelate2(
                         axis=1, keepdims=True
                     )
                     radii[p_index] = cdist(
-                        centroids[p_index], X[:, kinds]
+                        centroids[p_index].T, X[:, kinds].T
                     ).max()
                     labels[kinds] = p_index
 
                     # add new parcels
                     for j in range(1, split_factor):
-                        jeepers = np.flatnonzero(assignments == 0)
+                        jeepers = np.flatnonzero(assignments == j)
                         jinds = inds[jeepers]
                         indices.append(jinds)
                         centroids.append(
                             X[:, jinds].mean(axis=1, keepdims=True)
                         )
-                        radii.append(cdist(centroids[-1], X[:, jinds]).max())
+                        radii.append(
+                            cdist(centroids[-1].T, X[:, jinds].T).max()
+                        )
                         labels[jinds] = len(centroids) - 1
                 else:
                     print("warn: issue splitting parcel")

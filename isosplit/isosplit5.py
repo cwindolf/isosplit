@@ -13,7 +13,15 @@ def compute_centers(X, labels):
     # python has no accumarray, so heres one way to do it
     K = labels.max() + 1
     # hstack so cluster indexes the columns
-    return np.hstack([X[labels == k].mean(axis=1) for k in range(K)])
+    centers = []
+    for k in range(K):
+        kinds = np.flatnonzero(labels == k)
+        if kinds.size > 0:
+            centers.append(X[:, kinds].mean(axis=1, keepdims=True))
+        else:
+            centers.append(np.zeros((X.shape[0], 1)))
+
+    return np.hstack(centers)
 
 
 def get_pairs_to_compare(
@@ -73,7 +81,7 @@ def compare_pairs(
             if sz1 < min_cluster_size or sz2 < min_cluster_size:
                 do_merge = True
             else:
-                inds12 = np.vstack([inds1, inds2])
+                inds12 = np.hstack([inds1, inds2])
                 L12_old = np.zeros(inds12.size, dtype=np.bool)
                 L12_old[sz1:] = 1
                 do_merge, L12, proj, cutpoint = merge_test(
@@ -137,7 +145,7 @@ def whiten_two_clusters_b(X1, X2):
     cov1 = (X1c @ X1c.T) / N1
     cov2 = (X2c @ X2c.T) / N2
     avg_cov = (cov1 + cov2) / 2
-    V = c2 - c1
+    V = (c2 - c1).squeeze()
     if np.abs(la.det(avg_cov)) > 1e-6:
         V = la.inv(avg_cov) @ V
     V /= np.sqrt(V.T @ V)
