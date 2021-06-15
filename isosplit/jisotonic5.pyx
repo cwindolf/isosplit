@@ -24,6 +24,7 @@ cimport cython
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
+@cython.cdivision(True)
 def jisotonic5(double[::1] x, double[::1] weights):
     cdef Py_ssize_t N = x.shape[0]
 
