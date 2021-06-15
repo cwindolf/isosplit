@@ -17,7 +17,7 @@ def compute_centers(X, labels):
     for k in range(K):
         kinds = np.flatnonzero(labels == k)
         if kinds.size > 0:
-            centers.append(X[:, kinds].mean(axis=1, keepdims=True))
+            centers.append(X[:, kinds].mean(axis=1)[:, None])
         else:
             centers.append(np.zeros((X.shape[0], 1)))
 
@@ -64,7 +64,7 @@ def compare_pairs(
     labels,
     k1s,
     k2s,
-    isocut_threshold=1,
+    isocut_threshold=1.,
     min_cluster_size=10,
     whiten_cluster_pairs=True,
 ):
@@ -88,6 +88,7 @@ def compare_pairs(
                     X[:, inds1],
                     X[:, inds2],
                     whiten_cluster_pairs=whiten_cluster_pairs,
+                    isocut_threshold=isocut_threshold,
                 )
 
             if do_merge:
@@ -105,7 +106,7 @@ def compare_pairs(
     return new_labels, clusters_changed
 
 
-def merge_test(X1, X2, isocut_threshold=1, whiten_cluster_pairs=True):
+def merge_test(X1, X2, isocut_threshold=1., whiten_cluster_pairs=True):
     if whiten_cluster_pairs:
         X1, X2, V = whiten_two_clusters_b(X1, X2)
     else:
@@ -166,6 +167,7 @@ def isosplit5(
     initial_labels=None,
     prevent_merge=False,
     one_comparison_at_a_time=False,
+    verbose=False,
 ):
     """ISO-SPLIT
 
@@ -200,8 +202,17 @@ def isosplit5(
         X = X[None, :]
     M, N = X.shape
 
+    # whitening has no effect in 1d
+    if M == 1:
+        whiten_cluster_pairs = False
+
+    def vlog(*args):
+        if verbose:
+            print("isosplit:", *args)
+
     # -- compute initial labels
     if initial_labels is None:
+        vlog("parcelating...")
         labels = parcelate2(
             X,
             target_parcel_size=min_cluster_size,
@@ -215,6 +226,7 @@ def isosplit5(
 
     # original number of labels
     Kmax = labels.max() + 1
+    vlog("Kmax", Kmax)
 
     # -- compute cluster centers
     centers = compute_centers(X, labels)
@@ -313,6 +325,7 @@ def isosplit5(
     # remap labels to be contiguous
     unique_labels, labels = np.unique(labels, return_inverse=True)
     K = unique_labels.size
+    vlog("final k:", K)
 
     # if the user wants to refine the clusters, then repeat
     # isosplit on each of the new clusters, recursively,
@@ -333,6 +346,7 @@ def isosplit5(
                 initial_labels=initial_labels,
                 prevent_merge=prevent_merge,
                 one_comparison_at_a_time=one_comparison_at_a_time,
+                verbose=verbose,
             )
             labels_split[inds_k] = K_split + labels_k
             K_split += labels_k.max() + 1
