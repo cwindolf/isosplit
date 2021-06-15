@@ -1,6 +1,6 @@
 #
 # Copyright 2016-2017 Flatiron Institute, Simons Foundation
-# Adapted from MEX/C++ code by Charlie Windolf in June 2021, available at:
+# Translated by Charlie Windolf from MEX/C++ code in June 2021, available at:
 # github.com/flatironinstitute/isosplit5/blob/master/matlab/jisotonic5_mex.cpp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
