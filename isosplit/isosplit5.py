@@ -325,12 +325,12 @@ def isosplit5(
     # remap labels to be contiguous
     unique_labels, labels = np.unique(labels, return_inverse=True)
     K = unique_labels.size
-    vlog("final k:", K)
 
     # if the user wants to refine the clusters, then repeat
     # isosplit on each of the new clusters, recursively,
     # unless we only found one cluster
     if refine_clusters and K > 1:
+        vlog("k before recursion:", K)
         labels_split = np.zeros(N, dtype=np.int)
         K_split = 0
         for k in range(K):
@@ -350,5 +350,8 @@ def isosplit5(
             )
             labels_split[inds_k] = K_split + labels_k
             K_split += labels_k.max() + 1
+        vlog("final k:", K_split)
+    else:
+        vlog("final k:", K)
 
     return labels
