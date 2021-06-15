@@ -195,6 +195,8 @@ def isosplit5(
     # info = dict(iterations=[])
 
     # M is features, N is samples
+    if X.ndim == 1:
+        X = X[None, :]
     M, N = X.shape
 
     # -- compute initial labels
