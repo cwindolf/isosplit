@@ -1,5 +1,9 @@
 import numpy as np
 from isosplit.up_down import up_down_isotonic_regression
+import matplotlib.pyplot as plt
+
+
+rg = np.random.default_rng(0)
 
 
 # -- test jisotonic
@@ -20,12 +24,16 @@ def test_case(x, w=None):
     y = up_down_isotonic_regression(x, w)
     g = "updown" if is_updown(y) else "bad"
     print(f"{x} -> {y}, {g}")
+    plt.plot(range(len(x)), x, label="x")
+    plt.plot(range(len(x)), y, label="y")
+    plt.legend()
+    plt.show()
 
 
-# test
 test_case([1, 2, 3, 2, 1])
 test_case([1, 1, 3, 2, 1])
 test_case([1, 0, 3, 2, 3])
 test_case([1, 2, 3, 4, 5])
 test_case([5, 4, 3, 2, 1])
 test_case([3, 2, 1, 2, 3])
+test_case(rg.standard_normal(size=50))

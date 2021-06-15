@@ -84,6 +84,4 @@ def parcelate2(
         if not something_changed:
             break
 
-    print("parcelate got", len(centroids), "parcels")
-
     return labels

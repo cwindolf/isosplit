@@ -34,7 +34,7 @@ def get_pairs_to_compare(
     pair_dists = []
 
     dists = squareform(pdist(centers.T))
-    dists[comparisons_made != 0] = np.inf
+    dists[comparisons_made] = np.inf
     np.fill_diagonal(dists, np.inf)
 
     # take mutual closest pairs
@@ -198,7 +198,7 @@ def isosplit5(
 
     # -- main loop
     final_pass = False
-    comparisons_made = np.zeros((Kmax, Kmax))
+    comparisons_made = np.zeros((Kmax, Kmax), dtype=np.bool)
     # outer loop -- passes
     while True:
         # if not, final pass
@@ -229,7 +229,7 @@ def isosplit5(
             # that have not yet been compared in this pass
             inds1, inds2 = get_pairs_to_compare(
                 active_centers,
-                comparisons_made[active_labels, active_labels],
+                comparisons_made[active_labels, :][:, active_labels],
                 one_comparison_at_a_time=one_comparison_at_a_time,
             )
 
@@ -251,8 +251,8 @@ def isosplit5(
 
             # update which comparisons have been made
             for i1, i2 in zip(inds1, inds2):
-                comparisons_made[active_labels[i1], active_labels[i2]] = 1
-                comparisons_made[active_labels[i2], active_labels[i1]] = 1
+                comparisons_made[active_labels[i1], active_labels[i2]] = True
+                comparisons_made[active_labels[i2], active_labels[i1]] = True
 
             # recompute centers
             # matlab contains note: maybe this should only apply to
@@ -265,7 +265,7 @@ def isosplit5(
             # determine whether something has merged
             # note! matlab has zeros(1,N), should it be zeros(1,Kmax)?
             new_active_labels_vec = np.zeros(Kmax, dtype=np.bool)
-            new_active_labels_vec[labels] = 1
+            new_active_labels_vec[labels] = True
             if new_active_labels_vec.sum() < active_labels.size:
                 something_merged = True
 
@@ -275,7 +275,7 @@ def isosplit5(
         # that have changed
         clusters_changed = np.flatnonzero(clusters_changed_vec_in_pass)
         for cc in clusters_changed:
-            comparisons_made[cc, :] = comparisons_made[:, cc] = 0
+            comparisons_made[cc, :] = comparisons_made[:, cc] = False
 
         if something_merged:
             final_pass = False
@@ -300,7 +300,7 @@ def isosplit5(
         for k in range(K):
             inds_k = np.flatnonzero(labels == k)
             labels_k = isosplit5(
-                X[inds_k],
+                X[:, inds_k],
                 isocut_threshold=isocut_threshold,
                 min_cluster_size=min_cluster_size,
                 K_init=K_init,
