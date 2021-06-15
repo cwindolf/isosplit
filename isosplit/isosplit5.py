@@ -157,7 +157,7 @@ def whiten_two_clusters_b(X1, X2):
 
 def isosplit5(
     X,
-    isocut_threshold=1,
+    isocut_threshold=1.,
     min_cluster_size=10,
     K_init=200,
     refine_clusters=True,
@@ -167,15 +167,35 @@ def isosplit5(
     prevent_merge=False,
     one_comparison_at_a_time=False,
 ):
+    """ISO-SPLIT
+
+    Arguments
+    ---------
+    X : np.array (n_features, n_samples)
+    isocut_threshold : float
+        Critical value for dip score
+    min_cluster_size : int
+    K_init : int
+        Initial target number of clusters
+    refine_clusters : bool
+        Recursively refine clusters (unless only one was found).
+    max_iterations_per_pass : int
+    whiten_cluster_pairs : bool
+    initial_labels : integer np.array (n_samples,)
+        Initialize labels with these rather than running parcelate
+    prevent_merge : bool
+    one_comparison_at_a_time : bool
+
+    Returns
+    -------
+    labels : integer np.array (n_samples,)
+        The ISO-SPLIT cluster assignments
+    """
     # dict to be returned with info about the run
     # info = dict(iterations=[])
 
     # M is features, N is samples
     M, N = X.shape
-
-    # simplification in 1d
-    if M == 1:
-        whiten_cluster_pairs = False
 
     # -- compute initial labels
     if initial_labels is None:

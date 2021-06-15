@@ -92,17 +92,18 @@ def isocut5(samples, sample_weights=None):
         densities, multiplicities
     )
     peak_ind = np.argmax(densities_unimodal_fit)
+
+    # difficult translation of indexing from 1-based to 0-based in
+    # the following few lines. this has been checked thoroughly.
     ks_left, ks_left_ind = compute_ks5(
         multiplicities[0:peak_ind + 1],
-        densities_unimodal_fit[0:peak_ind + 1] * spacings[0:peak_ind + 1],
+        densities_unimodal_fit[0:peak_ind + 1]
+        * spacings[0:peak_ind + 1],
     )
-    # possibly this logic with the reversing is a matlab-ism
-    # that could be replaced by [peak_ind:] here, but it is
-    # kind of hard to follow all of the logic with the ks.
     ks_right, ks_right_ind = compute_ks5(
-        multiplicities[peak_ind:][::-1],
-        densities_unimodal_fit[peak_ind:][::-1]
-        * spacings[peak_ind:][::-1],
+        multiplicities[peak_ind - 1:][::-1],
+        densities_unimodal_fit[peak_ind - 1:][::-1]
+        * spacings[peak_ind - 1:][::-1],
     )
     ks_right_ind = spacings.size - ks_right_ind
 
