@@ -1,5 +1,9 @@
+# mac
+**/.DS_Store
+
 # cython artifacts
 isosplit/jisotonic5.c
+isosplit/jisotonic5.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
