@@ -195,6 +195,7 @@ def isosplit5(
     # info = dict(iterations=[])
 
     # M is features, N is samples
+    X = np.asarray(X)
     if X.ndim == 1:
         X = X[None, :]
     M, N = X.shape
