@@ -1,3 +1,24 @@
+#
+# Copyright 2016-2017 Flatiron Institute, Simons Foundation
+# Adapted from MEX/C++ code in June 2021, available at:
+# github.com/flatironinstitute/isosplit5/blob/master/matlab/jisotonic5_mex.cpp
+# Modifications (c) 2021 Charlie Windolf.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#!python
+#cython: language_level=3
 import numpy as np
 cimport cython
 
@@ -20,7 +41,8 @@ def jisotonic5(double[::1] x, double[::1] weights):
     cdef double[::1] sum = sum_
     sumsqr_ = np.zeros(N, dtype=np.double)
     cdef double[::1] sumsqr = sumsqr_
-    cdef Py_ssize_t last_index = 0
+    cdef int last_index
+    last_index = 0
 
     unweightedcount[last_index] = 1
     count[last_index] = weights[0]
@@ -31,6 +53,7 @@ def jisotonic5(double[::1] x, double[::1] weights):
     cdef double prevMSE
     cdef double newMSE
 
+    cdef int j
     for j in range(1, N):
         last_index += 1
         unweightedcount[last_index] = 1
@@ -55,7 +78,10 @@ def jisotonic5(double[::1] x, double[::1] weights):
             MSE[j] += newMSE - prevMSE
             last_index -= 1
 
-    cdef Py_ssize_t ii = 0
+    cdef int ii
+    ii = 0
+    cdef int k
+    cdef int cc
     for k in range(last_index + 1):
         for cc in range(unweightedcount[k]):
             y[ii + cc] = sum[k] / count[k]
