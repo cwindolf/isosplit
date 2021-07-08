@@ -14,7 +14,7 @@ run `pip install -e .` in this directory, and then check out the demo notebook i
 
 ### up-down isotonic regression
 
-this module also exports functions `up_down_isotonic_regression` and `down_up_isotonic_regression`, which are translations of the original authors' least squares up-down isotonic regression subroutine, which adapts the Pool-Adjacent-Violators algorithm from the usual isotonic regression setting
+this module also exports functions `up_down_isotonic_regression` and `down_up_isotonic_regression`. these are translations of the original authors' least squares up-down isotonic regression subroutine, which adapts the Pool-Adjacent-Violators algorithm from the usual isotonic regression setting. relies on a fast Cython implementation of PAV in `jisotonic5.pyx`, which is a very direct translation of the original corresponding C++ file.
 
 
 ### isosplit1d
