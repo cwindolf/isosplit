@@ -10,7 +10,7 @@ num_bins_factor = 1
 
 
 def drange(high, low=0, step=-1):
-    return range(high + 1, low - 1, step)
+    return range(high, low - 1, step)
 
 
 def updown_arange(num_bins, dtype=np.int):
@@ -18,7 +18,7 @@ def updown_arange(num_bins, dtype=np.int):
     num_bins_2 = num_bins - num_bins_1
     return np.fromiter(
         chain(
-            range(1, num_bins_1),
+            range(1, num_bins_1 + 1),
             drange(num_bins_2, 1),
         ),
         count=num_bins,
@@ -96,14 +96,12 @@ def isocut5(samples, sample_weights=None):
     # difficult translation of indexing from 1-based to 0-based in
     # the following few lines. this has been checked thoroughly.
     ks_left, ks_left_ind = compute_ks5(
-        multiplicities[0:peak_ind + 1],
-        densities_unimodal_fit[0:peak_ind + 1]
-        * spacings[0:peak_ind + 1],
+        multiplicities[0 : peak_ind + 1],
+        densities_unimodal_fit[0 : peak_ind + 1] * spacings[0 : peak_ind + 1],
     )
     ks_right, ks_right_ind = compute_ks5(
-        multiplicities[peak_ind - 1:][::-1],
-        densities_unimodal_fit[peak_ind - 1:][::-1]
-        * spacings[peak_ind - 1:][::-1],
+        multiplicities[peak_ind:][::-1],
+        densities_unimodal_fit[peak_ind:][::-1] * spacings[peak_ind:][::-1],
     )
     ks_right_ind = spacings.size - ks_right_ind
 
@@ -124,4 +122,3 @@ def isocut5(samples, sample_weights=None):
     cutpoint = (X_sub[cutpoint_ind] + X_sub[cutpoint_ind + 1]) / 2
 
     return dipscore, cutpoint
-
