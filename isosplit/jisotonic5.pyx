@@ -33,7 +33,7 @@ def jisotonic5(double[::1] x, double[::1] weights):
     y_ = np.zeros(N, dtype=np.double)
     cdef double[::1] y = y_
 
-    unweightedcount_ = np.zeros(N, dtype=np.int)
+    unweightedcount_ = np.zeros(N, dtype=np.int64)
     cdef long[::1] unweightedcount = unweightedcount_
     count_ = np.zeros(N, dtype=np.double)
     cdef double[::1] count = count_

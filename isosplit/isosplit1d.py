@@ -3,11 +3,14 @@ from isosplit import isocut
 
 
 def isosplit1d(x, isocut_threshold=1.0, min_size=10, min_diameter=0.0):
-    """Iso-Split 1D
+    """isosplit1d
+
+    My (cwindolf) extrapolation of the 1d procedure described in the 1d
+    section of the ISO-SPLIT paper to a clustering procedure in 1d.
 
     This is a natural specialization of ISO-SPLIT to the 1d case. The
-    idea:     recursively divide the domain of the input at putative
-    cut-points, using     ISO-CUT, until none of these are significant
+    idea: recursively divide the domain of the input at putative
+    cut-points, using ISO-CUT, until none of these are significant
     (or they would be too small according to `min_size` or `min_diameter`,
     see parameter documentation below.)
 
@@ -42,7 +45,7 @@ def isosplit1d(x, isocut_threshold=1.0, min_size=10, min_diameter=0.0):
     cutpoints : floating array of cutpoints
     """
     # jisotonic5.pyx expects double precision, so make sure we have it
-    x = np.asarray(x, dtype=np.float)
+    x = np.asarray(x, dtype=float)
     assert x.ndim == 1 or (x.ndim == 2 and 1 in x.shape)
     x = np.squeeze(x)
 
@@ -92,8 +95,8 @@ def isosplit1d(x, isocut_threshold=1.0, min_size=10, min_diameter=0.0):
     cutpoints = np.array(endpoints[1:-1])
 
     # and, compute the cluster assignments for the caller
-    y = np.zeros(x.size, dtype=np.int)
-    lower_mask = np.zeros(x.size, dtype=np.bool)
+    y = np.zeros(x.size, dtype=int)
+    lower_mask = np.zeros(x.size, dtype=bool)
     for k, upper_bound in enumerate(endpoints[1:]):
         upper_mask = x <= upper_bound
         y[~lower_mask & upper_mask] = k

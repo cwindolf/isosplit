@@ -13,7 +13,7 @@ def drange(high, low=0, step=-1):
     return range(high, low - 1, step)
 
 
-def updown_arange(num_bins, dtype=np.int):
+def updown_arange(num_bins, dtype=int):
     num_bins_1 = int(np.ceil(num_bins / 2))
     num_bins_2 = num_bins - num_bins_1
     return np.fromiter(
@@ -70,11 +70,11 @@ def isocut5(samples, sample_weights=None):
     del sort
 
     while True:
-        intervals = updown_arange(num_bins, dtype=np.float)
+        intervals = updown_arange(num_bins, dtype=float)
         alpha = (N - 1) / intervals.sum()
         intervals *= alpha
         # this line is the only one to translate to 0-based
-        inds = np.floor(np.hstack([[0], np.cumsum(intervals)])).astype(np.int)
+        inds = np.floor(np.hstack([[0], np.cumsum(intervals)])).astype(int)
         # N_sub = inds.size
         if intervals.min() >= 1:
             break

@@ -69,7 +69,7 @@ def compare_pairs(
     whiten_cluster_pairs=True,
 ):
     Kmax = labels.max() + 1
-    clusters_changed_vec = np.zeros(Kmax, dtype=np.bool)
+    clusters_changed_vec = np.zeros(Kmax, dtype=bool)
     new_labels = labels + 0
 
     for k1, k2 in zip(k1s, k2s):
@@ -82,7 +82,7 @@ def compare_pairs(
                 do_merge = True
             else:
                 inds12 = np.hstack([inds1, inds2])
-                L12_old = np.zeros(inds12.size, dtype=np.bool)
+                L12_old = np.zeros(inds12.size, dtype=bool)
                 L12_old[sz1:] = 1
                 do_merge, L12, proj, cutpoint = merge_test(
                     X[:, inds1],
@@ -127,7 +127,7 @@ def merge_test(X1, X2, isocut_threshold=1., whiten_cluster_pairs=True):
     dipscore, cutpoint = isocut5(proj12, np.ones(n1 + n2))
 
     do_merge = dipscore < isocut_threshold
-    new_labels = np.zeros(n1 + n2, dtype=np.bool)
+    new_labels = np.zeros(n1 + n2, dtype=bool)
     new_labels[proj12 > cutpoint] = 1
 
     return do_merge, new_labels, proj12, cutpoint
@@ -221,7 +221,7 @@ def isosplit5(
     else:
         # matlab code has some logic here; I will defer to the caller to know
         # what is going on.
-        labels = np.asarray(initial_labels, dtype=np.int)
+        labels = np.asarray(initial_labels, dtype=int)
         assert labels.shape == (N,)
 
     # original number of labels
@@ -233,7 +233,7 @@ def isosplit5(
 
     # -- main loop
     final_pass = False
-    comparisons_made = np.zeros((Kmax, Kmax), dtype=np.bool)
+    comparisons_made = np.zeros((Kmax, Kmax), dtype=bool)
     # outer loop -- passes
     while True:
         # if not, final pass
@@ -254,7 +254,7 @@ def isosplit5(
                 raise ValueError("max iterations per pass exceeded")
 
             # active labels are those which are still being used
-            active_labels_vec = np.zeros(Kmax, dtype=np.bool)
+            active_labels_vec = np.zeros(Kmax, dtype=bool)
             active_labels_vec[labels] = 1
             active_labels = np.flatnonzero(active_labels_vec)
             active_centers = centers[:, active_labels]
@@ -299,7 +299,7 @@ def isosplit5(
 
             # determine whether something has merged
             # note! matlab has zeros(1,N), should it be zeros(1,Kmax)?
-            new_active_labels_vec = np.zeros(Kmax, dtype=np.bool)
+            new_active_labels_vec = np.zeros(Kmax, dtype=bool)
             new_active_labels_vec[labels] = True
             if new_active_labels_vec.sum() < active_labels.size:
                 something_merged = True
@@ -331,7 +331,7 @@ def isosplit5(
     # unless we only found one cluster
     if refine_clusters and K > 1:
         vlog("k before recursion:", K)
-        labels_split = np.zeros(N, dtype=np.int)
+        labels_split = np.zeros(N, dtype=int)
         K_split = 0
         for k in range(K):
             inds_k = np.flatnonzero(labels == k)
