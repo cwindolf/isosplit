@@ -55,7 +55,7 @@ def compute_ks5(counts1, counts2):
 # -- main
 
 
-def isocut5(samples, sample_weights=None):
+def isocut5(samples, sample_weights=None, cutpoint=None):
     assert samples.ndim == 1
     N = samples.size
     assert N > 0
@@ -122,3 +122,66 @@ def isocut5(samples, sample_weights=None):
     cutpoint = (X_sub[cutpoint_ind] + X_sub[cutpoint_ind + 1]) / 2
 
     return dipscore, cutpoint
+
+
+def dipscore_at(cutpoint, samples, sample_weights=None):
+    assert samples.ndim == 1
+    N = samples.size
+    assert N > 0
+    num_bins = int(np.ceil(np.sqrt(N / 2) * num_bins_factor))
+
+    if sample_weights is None:
+        sample_weights = np.ones(N)
+
+    sort = np.argsort(samples)
+    X = samples[sort]
+    sample_weights = sample_weights[sort]
+    del sort
+
+    while True:
+        intervals = updown_arange(num_bins, dtype=float)
+        alpha = (N - 1) / intervals.sum()
+        intervals *= alpha
+        # this line is the only one to translate to 0-based
+        inds = np.floor(np.hstack([[0], np.cumsum(intervals)])).astype(int)
+        # N_sub = inds.size
+        if intervals.min() >= 1:
+            break
+        else:
+            num_bins -= 1
+    del intervals
+
+    X = X[inds]
+    spacings = np.diff(X)
+    cumsum_sample_weights = np.cumsum(sample_weights)
+    multiplicities = np.diff(cumsum_sample_weights[inds])
+    densities = multiplicities / spacings
+
+    # cumsum_sample_weights = np.cumsum(sample_weights)
+    # spacings = np.diff(X)
+    # multiplicities = np.diff(cumsum_sample_weights)
+    # # multiplicities = 0.5 * (sample_weights[1:] + sample_weights[:-1])
+    # densities = multiplicities / spacings
+    densities /= np.sum(densities * spacings)
+
+    densities_unimodal_fit = up_down_isotonic_regression(
+        densities, multiplicities
+    )
+    densities_unimodal_fit /= np.sum(densities_unimodal_fit * spacings)
+    
+    cdf_original = np.cumsum(densities * spacings)
+    cdf_model = np.cumsum(densities_unimodal_fit * spacings)
+    dcdf = cdf_original - cdf_model
+    n = sample_weights.sum()
+    
+    bin_centers = 0.5 * (X[1:] + X[:-1])
+    inda = np.searchsorted(bin_centers, cutpoint, side="right") - 1
+
+    ds = max(
+        np.abs(dcdf[inda]),
+        np.abs(dcdf[inda + 1]),
+    )
+    ks = ds * np.sqrt(n)
+
+    return ks, bin_centers, spacings, densities, densities_unimodal_fit
+    

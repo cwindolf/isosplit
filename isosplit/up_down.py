@@ -2,12 +2,13 @@ import numpy as np
 from .jisotonic5 import jisotonic5
 
 
-def up_down_isotonic_regression(x, weights=None):
+def up_down_isotonic_regression(x, weights=None, best_ind=None):
     # determine switch point
     _, mse1 = jisotonic5(x, weights)
     _, mse2r = jisotonic5(x[::-1].copy(), weights[::-1].copy())
     mse0 = mse1 + mse2r[::-1]
-    best_ind = mse0.argmin()
+    if best_ind is None:
+        best_ind = mse0.argmin()
 
     # regressions. note the negatives for decreasing.
     y1, _ = jisotonic5(x[:best_ind], weights[:best_ind])
